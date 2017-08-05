@@ -2,6 +2,7 @@ package io.github.feelfreelinux.wykopmobilny.adapters
 
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import io.github.feelfreelinux.wykopmobilny.R
 import io.github.feelfreelinux.wykopmobilny.adapters.holders.FeedViewHolder

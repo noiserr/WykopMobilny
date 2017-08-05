@@ -17,7 +17,7 @@ interface FeedViewCallbacks {
 
 abstract class FeedPresenter(val wam : WykopApiManager, val callbacks: FeedViewCallbacks) {
     var entryList = ArrayList<Entry>()
-    var dataLoadedListener : DataLoadedListener = {}
+    var dataLoadedListener = {}
 
     fun onBindListItem(position : Int, listItem : FeedViewItem) {
         // Set tag clicked listener
