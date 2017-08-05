@@ -1,27 +1,20 @@
 package io.github.feelfreelinux.wykopmobilny.fragments
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v7.app.AppCompatActivity
+import android.support.v4.content.ContextCompat
+import android.support.v7.widget.LinearLayoutManager
 import android.view.*
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Spinner
 import io.github.feelfreelinux.wykopmobilny.R
+import io.github.feelfreelinux.wykopmobilny.presenters.HotFeedPresenter
+import kotlinx.android.synthetic.main.toolbar.*
 
 class HotFeedFragment : FeedFragment() {
-    var period = "24"
-    val supportActionBar by lazy{ (activity as AppCompatActivity).supportActionBar }
+    override val feedPresenter by lazy { HotFeedPresenter(wam, callbacks) }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)
+        navActivity.toolbar.overflowIcon = ContextCompat.getDrawable(activity, R.drawable.clock_icon)
         return super.onCreateView(inflater, container, savedInstanceState)
-    }
-
-    override fun loadData(page : Int, resultCallback : (Any) -> Unit) {
-        when(period) {
-            "6", "12", "24" -> wam.getMikroblogHot(page, period, resultCallback)
-            "newest" -> wam.getMikroblogIndex(page, resultCallback)
-        }
     }
 
     companion object {
@@ -31,28 +24,35 @@ class HotFeedFragment : FeedFragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        // Create hot peroid menu
         inflater?.inflate(R.menu.hot_period, menu)
-        val item = menu?.findItem(R.id.spinner)
-        val spinner = item?.actionView as Spinner
-        val adapter = ArrayAdapter<String>(
-                supportActionBar?.themedContext,
-                R.layout.actionbar_spinner,
-                R.id.text1, resources.getStringArray(R.array.hotPeriodSpinner))
+        navActivity.toolbar.setTitle(R.string.period24)
+    }
 
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(p0: AdapterView<*>?) {}
-
-            override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
-                when(position) {
-                    0 -> period = "24"
-                    1 -> period = "12"
-                    2 -> period = "6"
-                    3 -> period = "newest"
-                }
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        when (item?.itemId) {
+            R.id.period6  -> {
+                feedPresenter.period = "6"
+                navActivity.toolbar.setTitle(R.string.period6)
+            }
+            R.id.period12 -> {
+                feedPresenter.period = "12"
+                navActivity.toolbar.setTitle(R.string.period12)
+            }
+            R.id.period24 -> {
+                feedPresenter.period = "24"
+                navActivity.toolbar.setTitle(R.string.period24)
+            }
+            R.id.newest   -> {
+                feedPresenter.period = "newest"
+                navActivity.toolbar.setTitle(R.string.newest_entries)
             }
         }
-        spinner.adapter = adapter
-        super.onCreateOptionsMenu(menu, inflater)
+
+        // Acts as refresh action
+        navActivity.isRefreshing = true
+        feedPresenter.loadData(1)
+        return true
     }
+
+
 }
