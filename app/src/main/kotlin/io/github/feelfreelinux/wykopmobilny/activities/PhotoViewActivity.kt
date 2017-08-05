@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import io.github.feelfreelinux.wykopmobilny.R
-import io.github.feelfreelinux.wykopmobilny.projectors.PhotoViewActions
+import io.github.feelfreelinux.wykopmobilny.presenters.PhotoViewActions
 import io.github.feelfreelinux.wykopmobilny.utils.loadImage
 import kotlinx.android.synthetic.main.activity_photoview.*
 import kotlinx.android.synthetic.main.toolbar.*
@@ -18,8 +18,8 @@ fun Context.launchPhotoView(imageUrl: String) {
 }
 
 class PhotoViewActivity : WykopActivity() {
-    val url by lazy {intent.getStringExtra("URL")}
-    val photoViewActions by lazy { PhotoViewActions(this) }
+    val url: String by lazy { intent.getStringExtra("URL") }
+    private val photoViewActions by lazy { PhotoViewActions(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,19 +34,12 @@ class PhotoViewActivity : WykopActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when(item?.itemId) {
-            R.id.action_share ->
-                photoViewActions.shareImage()
-
-            R.id.action_save_image ->
-                photoViewActions.saveImage()
-
-            R.id.action_copy_url ->
-                photoViewActions.copyURL()
-
-            else ->
-                return super.onOptionsItemSelected(item)
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_share -> photoViewActions.shareImage()
+            R.id.action_save_image -> photoViewActions.saveImage()
+            R.id.action_copy_url -> photoViewActions.copyURL()
+            else -> return super.onOptionsItemSelected(item)
         }
         return true
     }

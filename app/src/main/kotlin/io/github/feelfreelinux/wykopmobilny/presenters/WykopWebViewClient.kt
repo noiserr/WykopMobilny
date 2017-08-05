@@ -1,4 +1,4 @@
-package io.github.feelfreelinux.wykopmobilny.projectors
+package io.github.feelfreelinux.wykopmobilny.presenters
 
 import android.annotation.TargetApi
 import android.os.Build
@@ -9,8 +9,7 @@ import io.github.feelfreelinux.wykopmobilny.utils.ApiPreferences
 
 typealias loginSuccessCallback = () -> Unit
 
-class WykopWebViewClient : WebViewClient() {
-    private val apiPreferences = ApiPreferences()
+class WykopWebViewClient(val apiPreferences : ApiPreferences) : WebViewClient() {
     private var loginSuccessCallback: loginSuccessCallback? = null
 
     @Suppress("OverridingDeprecatedMember")
