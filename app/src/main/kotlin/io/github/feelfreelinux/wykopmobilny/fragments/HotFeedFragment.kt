@@ -3,14 +3,14 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.LinearLayoutManager
 import android.view.*
 import io.github.feelfreelinux.wykopmobilny.R
 import io.github.feelfreelinux.wykopmobilny.presenters.HotFeedPresenter
 import kotlinx.android.synthetic.main.toolbar.*
 
 class HotFeedFragment : FeedFragment() {
-    override val feedPresenter by lazy { HotFeedPresenter(apiManager, callbacks) }
-    val supportActionBar by lazy{ (activity as AppCompatActivity).supportActionBar }
+    override val feedPresenter by lazy { HotFeedPresenter(this, apiManager) }
 
     override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         setHasOptionsMenu(true)

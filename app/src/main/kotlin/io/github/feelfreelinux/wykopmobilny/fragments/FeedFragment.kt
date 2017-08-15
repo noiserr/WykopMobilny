@@ -19,10 +19,9 @@ import io.github.feelfreelinux.wykopmobilny.adapters.FeedAdapter
 import io.github.feelfreelinux.wykopmobilny.objects.Entry
 import io.github.feelfreelinux.wykopmobilny.callbacks.FeedClickCallbacks
 import io.github.feelfreelinux.wykopmobilny.presenters.FeedPresenter
-import io.github.feelfreelinux.wykopmobilny.presenters.FeedViewCallbacks
 import io.github.feelfreelinux.wykopmobilny.utils.*
 
-abstract class FeedFragment : Fragment(), ILoadMore, SwipeRefreshLayout.OnRefreshListener {
+abstract class FeedFragment : Fragment(), ILoadMore, SwipeRefreshLayout.OnRefreshListener, FeedPresenter.View {
     private val kodein = LazyKodein(appKodein)
 
     lateinit var recyclerView: RecyclerView
@@ -30,8 +29,8 @@ abstract class FeedFragment : Fragment(), ILoadMore, SwipeRefreshLayout.OnRefres
 
     protected val apiManager: WykopApiManager by kodein.instance()
     protected val navActivity by lazy { activity as NavigationActivity }
-    protected var feedAdapter: FeedAdapter? = null
     protected val callbacks by lazy { FeedClickCallbacks(navActivity, apiManager) }
+    protected val feedAdapter by lazy { FeedAdapter(callbacks) }
 
     abstract val feedPresenter : FeedPresenter
 
@@ -54,26 +53,26 @@ abstract class FeedFragment : Fragment(), ILoadMore, SwipeRefreshLayout.OnRefres
         recyclerView.addOnScrollListener(endlessScrollListener)
         navActivity.setSwipeRefreshListener(this)
 
-        feedPresenter.dataLoadedListener = {
-            feedAdapter?.notifyDataSetChanged()
-            navActivity.isLoading = false
-            navActivity.isRefreshing = false
-        }
+        recyclerView.adapter = feedAdapter
 
         // Create adapter if no data is saved
-        if(feedAdapter == null) {
-            feedAdapter = FeedAdapter(feedPresenter)
-            recyclerView.adapter = feedAdapter
-
+        if(feedAdapter.entryList.size == 0) {
             // Set needed flags
             navActivity.isLoading = true
 
             // Trigger data loading
             feedPresenter.loadData(1)
-        } else
-            recyclerView.adapter = feedAdapter // Get data from saved instance
+        }
 
         return view
+    }
+
+    override fun addDataToAdapter(entryList: List<Entry>, shouldClearAdapter: Boolean) {
+        if (shouldClearAdapter) feedAdapter.entryList.clear()
+        navActivity.isRefreshing = false
+        navActivity.isLoading = false
+        feedAdapter.entryList.addAll(entryList)
+        feedAdapter.notifyDataSetChanged()
     }
 
     override fun onRefresh() {
